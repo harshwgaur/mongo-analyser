@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import { LogStreamer } from "./services/LogStreamer.service";
+import { FilterOpType } from "./services/FilterOpType.service";
 
 const chalk = require('chalk');
 const clear = require('clear');
@@ -29,7 +30,7 @@ const argv = require('yargs/yargs')(hideBin(process.argv))
         alias: 'l', describe: 'Limit the number of output rows', type: 'number', default: 100
     })
     .options('log-file', {
-        alias: 'f', describe: 'Full Log file path to analyse', demandOption: true, type: 'string'
+        alias: 'f', describe: 'Full Log file path to analyse', demandOption: false, type: 'string'
     })
     .options('page-size', {
         alias: 'p', describe: 'Page size of HTML table in report', default: 50, type: 'number'
@@ -37,9 +38,37 @@ const argv = require('yargs/yargs')(hideBin(process.argv))
     .options('slow-ms', {
         alias: 's', describe: 'Slow MS Threshold for Query Profiling', default: 100, type: 'number'
     })
+    .options('uri' , {
+        alias: 'u', describe: 'Connection string for connection to mongo db', demandOption: false, type: 'string'
+    })
+    .options('db' , {
+        alias: 'd', describe: 'Database for mongo db', demandOption: false, type: 'string'
+    })
+    .options('ns' , {
+        alias: 'n', describe: 'Namespace to sort', demandOption: false, type: 'string'
+    })
+    .options('optype' , {
+        alias: 'o', describe: 'Operation to sort', demandOption: false, type: 'string'
+    })
+    .options('thread' , {
+        alias: 't', describe: 'Thread to sort', demandOption: false, type: 'string'
+    })
     .help('help').argv
 
+
+    console.log(argv);
+    const filterOpType = new FilterOpType(argv.f , argv.n , argv.o, argv.t);
+            filterOpType.prepareResult();
 // logFilePath: string, isGrouped: boolean, limit: number,
 // uiPageSize: number, slowMs: number
-const logStreamer = new LogStreamer(argv.f, argv.g, argv.l, argv.p, argv.s);
-logStreamer.stream();
+// switch (argv) {
+//     case argv.u:
+//             const filterOpType = new FilterOpType(argv.u , argv.db);
+//             filterOpType.connectToMongoDB();
+//         break;
+
+//     default:
+//         break;
+// }
+// const logStreamer = new LogStreamer(argv.f, argv.g, argv.l, argv.p, argv.s , argv.u);
+// logStreamer.stream();

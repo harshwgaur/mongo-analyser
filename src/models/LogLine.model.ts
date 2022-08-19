@@ -63,3 +63,12 @@ export interface LogLineModel {
     msg: string;
     attr: Attr;
 }
+
+
+export interface LogFilterModel {
+    namespace: string;
+    thread: string;
+    optype: string;
+    query: string;
+    log: any;
+}

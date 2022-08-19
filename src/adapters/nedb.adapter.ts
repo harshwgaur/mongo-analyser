@@ -12,9 +12,11 @@ export class LocalDBAdapter {
         });
     }
 
-    public insert(object: any): Boolean {
-        return this.datastore.insert(object, (err: any, newDoc: any) => {
-            if (err) return false;
+    public insert(object: any): any {
+        this.datastore.insert(object, (err: any, newDoc: any) => {
+            if (err) {
+                console.log(err);
+            }
             else return true;
         });
     }
@@ -24,4 +26,10 @@ export class LocalDBAdapter {
             return docs;
         });
     }
+    
+    public async fetchAsync (query: any) {
+        return await this.datastore.find(query);
+    }
+
+
 }
