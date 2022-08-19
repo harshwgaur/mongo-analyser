@@ -1,12 +1,11 @@
-var mongoClient = require("mongodb").MongoClient,
-    db;
+var mongoClient = require("mongodb").MongoClient;
 
 export class MongoDBAdapter {
     private db: any;
 
     async connect(con_string: string, db_name: any) {
         try {
-            var connection = await mongoClient.connect(con_string, { useNewUrlParser: true });
+            const connection = await mongoClient.connect(con_string, { useNewUrlParser: true });
             this.db = connection.db(db_name);
             console.log("MongoClient Connection successfull.");
         }
@@ -36,12 +35,33 @@ export class MongoDBAdapter {
         return this.db.collection(coll).aggregate(query).toArray();
     }
 
+    async runIndexStats(db: string, coll: string){
+        const client = new mongoClient("mongodb+srv://root:root@demo.qo3dr.mongodb.net");
+        await client.connect();
+        const conn = await client.db(db);
+        return await conn.collection(coll).aggregate([{"$indexStats": {}}]).toArray();
+    }
+
     async getDocumentCountByQuery(coll: string, query: any) {
         return this.db.collection(coll).estimatedDocumentCount(query || {})
     }
 
     async runAdminCommand(command: any) {
         return this.db.collection("admin").runCommand(command);
+    }
+
+    async listDatabases() {
+        const client = new mongoClient("mongodb+srv://root:root@demo.qo3dr.mongodb.net");
+        await client.connect();
+        const adminDb = await client.db("admin").admin();
+        return await adminDb.listDatabases();
+    }
+
+    async listCollections(db: string) {
+        const client = new mongoClient("mongodb+srv://root:root@demo.qo3dr.mongodb.net");
+        await client.connect();
+        const conn = await client.db(db);
+        return await conn.listCollections().toArray();
     }
 
     async close() {
