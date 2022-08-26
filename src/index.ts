@@ -4,7 +4,7 @@ import { LogStreamer } from "./services/LogStreamer.service";
 import { FilterOpType } from "./services/FilterOpType.service";
 import {ReplicationStateChange} from "./services/ReplicationStateChange.service";
 import {RedundantIndex} from "./services/RedundantIndex.service";
-
+import { DistinctMsgCount } from "./services/DistinctMsgCount.service";
 const chalk = require('chalk');
 const clear = require('clear');
 const figlet = require('figlet');
@@ -59,6 +59,8 @@ const argv = require('yargs/yargs')(hideBin(process.argv))
         alias: 'r', describe: 'Replicaset status over time', default: false, type: 'boolean'
     }).options('redundant-index', {
         alias: 'i', describe: 'Redundant Index Status accross DB', default: false, type: 'boolean'
+    }).options('distinct-msg-count', {
+        alias: 'dmc', describe: 'Group all the lines for a log file together by the type of message'
     })
     .help('help').argv
 
@@ -78,4 +80,7 @@ if (argv.r) {
 } else if (argv.f) {
     const logStreamer = new LogStreamer(argv.f, argv.g, argv.l, argv.p, argv.s);
     logStreamer.stream();
+} else if (argv.dmc) {
+    const distinctMsgCount = new DistinctMsgCount(argv.f);
+    distinctMsgCount.stream();
 }
