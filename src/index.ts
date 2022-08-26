@@ -2,6 +2,8 @@
 
 import { LogStreamer } from "./services/LogStreamer.service";
 import { FilterOpType } from "./services/FilterOpType.service";
+import {ReplicationStateChange} from "./services/ReplicationStateChange.service";
+import {RedundantIndex} from "./services/RedundantIndex.service";
 
 const chalk = require('chalk');
 const clear = require('clear');
@@ -13,7 +15,7 @@ const { hideBin } = require('yargs/helpers');
 // Clear the CLI before execution starts
 clear();
 
-// Print branding - because, why not! :) 
+// Print branding - because, why not! :)
 console.log(
     chalk.green(
         // figlet.textSync('Mongo Analyser', { horizontalLayout: 'full' })
@@ -21,7 +23,7 @@ console.log(
 );
 
 
-// Add CLI Options and parse process.argv 
+// Add CLI Options and parse process.argv
 const argv = require('yargs/yargs')(hideBin(process.argv))
     .options('group', {
         alias: 'g', describe: 'Group the output by query formats', type: 'boolean', default: false
@@ -53,6 +55,11 @@ const argv = require('yargs/yargs')(hideBin(process.argv))
     .options('thread' , {
         alias: 't', describe: 'Thread to sort', demandOption: false, type: 'string'
     })
+    .options('rs-status-change', {
+        alias: 'r', describe: 'Replicaset status over time', default: false, type: 'boolean'
+    }).options('redundant-index', {
+        alias: 'i', describe: 'Redundant Index Status accross DB', default: false, type: 'boolean'
+    })
     .help('help').argv
 
 
@@ -61,14 +68,14 @@ const argv = require('yargs/yargs')(hideBin(process.argv))
             filterOpType.prepareResult();
 // logFilePath: string, isGrouped: boolean, limit: number,
 // uiPageSize: number, slowMs: number
-// switch (argv) {
-//     case argv.u:
-//             const filterOpType = new FilterOpType(argv.u , argv.db);
-//             filterOpType.connectToMongoDB();
-//         break;
-
-//     default:
-//         break;
-// }
-// const logStreamer = new LogStreamer(argv.f, argv.g, argv.l, argv.p, argv.s , argv.u);
-// logStreamer.stream();
+// console.log(argv);
+if (argv.r) {
+    const replicationStateChange = new ReplicationStateChange(argv.f, argv.g, argv.l, argv.p, argv.s);
+    replicationStateChange.parse();
+} else if (argv.i) {
+    const redundantIndex = new RedundantIndex();
+    redundantIndex.process().then(() => console.log("successful"));
+} else if (argv.f) {
+    const logStreamer = new LogStreamer(argv.f, argv.g, argv.l, argv.p, argv.s);
+    logStreamer.stream();
+}
