@@ -54,6 +54,7 @@ export interface Attr {
     originatingCommand?: BaseObject;
 }
 
+
 export interface LogLineModel {
     t: LogTimestamp;
     s: string;

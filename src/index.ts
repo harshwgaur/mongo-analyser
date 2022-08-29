@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { ConnectionDetailsService } from "./services/ConnectionDetailsService.service";
 import { LogStreamer } from "./services/LogStreamer.service";
 
 const chalk = require('chalk');
@@ -36,10 +37,15 @@ const argv = require('yargs/yargs')(hideBin(process.argv))
     })
     .options('slow-ms', {
         alias: 's', describe: 'Slow MS Threshold for Query Profiling', default: 100, type: 'number'
+    }).options('connection-info', {
+        alias: 'c', describe: 'Displays Connection Info', demandOption: false, type: 'boolean'
     })
     .help('help').argv
 
 // logFilePath: string, isGrouped: boolean, limit: number,
 // uiPageSize: number, slowMs: number
-const logStreamer = new LogStreamer(argv.f, argv.g, argv.l, argv.p, argv.s);
-logStreamer.stream();
+if(argv.c)
+{
+    const logStreamer = new ConnectionDetailsService(argv.f);
+    logStreamer.stream();
+}
